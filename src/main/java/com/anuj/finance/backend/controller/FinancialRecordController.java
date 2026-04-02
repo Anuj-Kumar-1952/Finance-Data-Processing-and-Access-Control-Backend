@@ -2,6 +2,8 @@ package com.anuj.finance.backend.controller;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,6 +19,7 @@ import com.anuj.finance.backend.dto.FinancialRecordRequest;
 import com.anuj.finance.backend.dto.FinancialRecordResponse;
 import com.anuj.finance.backend.service.FinancialRecordService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -28,29 +31,32 @@ public class FinancialRecordController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public FinancialRecordResponse create(@RequestBody FinancialRecordRequest request,
+    public ResponseEntity<FinancialRecordResponse> create(
+            @Valid @RequestBody FinancialRecordRequest request,
             Authentication authentication) {
 
-        return recordService.createRecord(request, authentication.getName());
+        FinancialRecordResponse response = recordService.createRecord(request, authentication.getName());
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public FinancialRecordResponse update(@PathVariable Long id,
-            @RequestBody FinancialRecordRequest request) {
-        return recordService.updateRecord(id, request);
+    public ResponseEntity<FinancialRecordResponse> update(@PathVariable Long id,
+            @RequestBody FinancialRecordRequest request, Authentication authentication) {
+
+        return ResponseEntity.ok(recordService.updateRecord(id, request, authentication.getName()));
     }
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN','ANALYST','VIEWER')")
-    public List<FinancialRecordResponse> getAll() {
-        return recordService.getAllRecords();
+    public ResponseEntity<List<FinancialRecordResponse>> getAll() {
+        return ResponseEntity.ok(recordService.getAllRecords());
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public String delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         recordService.deleteRecord(id);
-        return "Deleted successfully";
+        return ResponseEntity.noContent().build();
     }
 }

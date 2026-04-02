@@ -8,6 +8,7 @@ import com.anuj.finance.backend.dto.FinancialRecordRequest;
 import com.anuj.finance.backend.dto.FinancialRecordResponse;
 import com.anuj.finance.backend.entity.FinancialRecord;
 import com.anuj.finance.backend.entity.User;
+import com.anuj.finance.backend.exception.ResourceNotFoundException;
 import com.anuj.finance.backend.repository.FinancialRecordRepository;
 import com.anuj.finance.backend.repository.UserRepository;
 
@@ -24,12 +25,12 @@ public class FinancialRecordServiceImpl implements FinancialRecordService {
     public FinancialRecordResponse createRecord(FinancialRecordRequest request, String email) {
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         FinancialRecord record = FinancialRecord.builder()
                 .amount(request.getAmount())
                 .type(request.getType())
-                .category(request.getCategory())
+                .category(request.getCategory() != null ? request.getCategory() : "Others")
                 .date(request.getDate())
                 .description(request.getDescription())
                 .createdBy(user)
@@ -41,14 +42,21 @@ public class FinancialRecordServiceImpl implements FinancialRecordService {
     }
 
     @Override
-    public FinancialRecordResponse updateRecord(Long id, FinancialRecordRequest request) {
+    public FinancialRecordResponse updateRecord(Long id, FinancialRecordRequest request, String email) {
 
+        // Fetch record
         FinancialRecord record = recordRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Record not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Record not found"));
 
+        // Ownership check
+        if (!record.getCreatedBy().getEmail().equals(email)) {
+            throw new RuntimeException("You are not allowed to update this record");
+        }
+
+        // Update fields
         record.setAmount(request.getAmount());
         record.setType(request.getType());
-        record.setCategory(request.getCategory());
+        record.setCategory(request.getCategory() != null ? request.getCategory() : "Others");
         record.setDate(request.getDate());
         record.setDescription(request.getDescription());
 
@@ -67,7 +75,11 @@ public class FinancialRecordServiceImpl implements FinancialRecordService {
 
     @Override
     public void deleteRecord(Long id) {
-        recordRepository.deleteById(id);
+
+        FinancialRecord record = recordRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Record not found"));
+
+        recordRepository.delete(record);
     }
 
     private FinancialRecordResponse mapToResponse(FinancialRecord record) {
