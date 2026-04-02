@@ -41,6 +41,23 @@ public class FinancialRecordServiceImpl implements FinancialRecordService {
     }
 
     @Override
+    public FinancialRecordResponse updateRecord(Long id, FinancialRecordRequest request) {
+
+        FinancialRecord record = recordRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Record not found"));
+
+        record.setAmount(request.getAmount());
+        record.setType(request.getType());
+        record.setCategory(request.getCategory());
+        record.setDate(request.getDate());
+        record.setDescription(request.getDescription());
+
+        recordRepository.save(record);
+
+        return mapToResponse(record);
+    }
+
+    @Override
     public List<FinancialRecordResponse> getAllRecords() {
         return recordRepository.findAll()
                 .stream()
