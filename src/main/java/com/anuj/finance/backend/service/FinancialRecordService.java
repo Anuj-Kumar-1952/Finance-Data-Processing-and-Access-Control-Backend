@@ -2,14 +2,13 @@ package com.anuj.finance.backend.service;
 
 import com.anuj.finance.backend.dto.FinancialRecordRequest;
 import com.anuj.finance.backend.dto.FinancialRecordResponse;
-
-import java.util.List;
+import com.anuj.finance.backend.dto.PaginatedResponse;
 
 public interface FinancialRecordService {
 
     FinancialRecordResponse createRecord(FinancialRecordRequest request, String userEmail);
 
-    List<FinancialRecordResponse> getAllRecords();
+    PaginatedResponse<FinancialRecordResponse> getAllRecords(int page, int size,String type);
 
     FinancialRecordResponse updateRecord(Long id, FinancialRecordRequest request, String Email);
 

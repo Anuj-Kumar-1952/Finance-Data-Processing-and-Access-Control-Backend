@@ -1,5 +1,6 @@
 package com.anuj.finance.backend.security;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 
@@ -8,8 +9,6 @@ import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-
-import java.nio.charset.StandardCharsets;
 
 @Component
 public class JwtUtil {
@@ -42,6 +41,17 @@ public class JwtUtil {
                 .getSubject();
     }
 
+    public boolean isTokenExpired(String token) {
+        Date expirationDate = Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getExpiration();
+
+        return expirationDate.before(new Date());
+    }
+
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder()
@@ -52,16 +62,5 @@ public class JwtUtil {
         } catch (Exception e) {
             return false;
         }
-    }
-
-    public boolean isTokenExpired(String token) {
-        Date expirationDate = Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .getExpiration();
-
-        return expirationDate.before(new Date());
     }
 }

@@ -1,16 +1,12 @@
 package com.anuj.finance.backend.security;
 
 import java.io.IOException;
-import java.util.List;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-
-import com.anuj.finance.backend.entity.User;
-import com.anuj.finance.backend.repository.UserRepository;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -23,51 +19,47 @@ import lombok.RequiredArgsConstructor;
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
-    private final UserRepository userRepository;
+    private final CustomUserDetailsService userDetailsService;
 
-    @Override
-    protected void doFilterInternal(HttpServletRequest request,
-            HttpServletResponse response,
-            FilterChain filterChain)
-            throws ServletException, IOException {
+   @Override
+protected void doFilterInternal(HttpServletRequest request,
+        HttpServletResponse response,
+        FilterChain filterChain)
+        throws ServletException, IOException {
 
-        String authHeader = request.getHeader("Authorization");
+    String authHeader = request.getHeader("Authorization");
 
-        // Step 1: Check header
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+    if (authHeader != null && authHeader.startsWith("Bearer ")) {
 
         String token = authHeader.substring(7);
 
-        // Step 2: Validate token
-        if (!jwtUtil.validateToken(token)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+        try {
+            if (jwtUtil.validateToken(token)) {
 
-        String email = jwtUtil.extractEmail(token);
+                String email = jwtUtil.extractEmail(token);
 
-        // Step 3: Set authentication if not already set
-        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            User user = userRepository.findByEmail(email).orElse(null);
+                    UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
-            if (user != null && user.isActive()) {
+                    UsernamePasswordAuthenticationToken authToken =
+                            new UsernamePasswordAuthenticationToken(
+                                    userDetails,
+                                    null,
+                                    userDetails.getAuthorities()
+                            );
 
-                var authorities = List.of(
-                        new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
 
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        user.getEmail(),
-                        null,
-                        authorities);
-
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+                    System.out.println("Authenticated user: " + email);
+                    System.out.println("Authorities: " + userDetails.getAuthorities());
+                }
             }
+        } catch (Exception e) {
+            System.out.println("JWT Error: " + e.getMessage());
         }
-
-        filterChain.doFilter(request, response);
     }
+
+    filterChain.doFilter(request, response);
+}
 }
