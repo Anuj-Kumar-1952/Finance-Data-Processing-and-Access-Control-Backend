@@ -28,6 +28,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()
+                // .requestMatchers("/api/users/**").permitAll() // this is required for creating admin user for the first time and should be removed later
                 .anyRequest().authenticated()
             )
             .sessionManagement(session ->

@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,7 +29,7 @@ public class UserController {
 
     private final UserService userService;
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')") // this is not required for creating admin user for the first time and should not be removed later
     @PostMapping
     public ResponseEntity<UserResponse> createUser(@Valid @RequestBody UserRequest request) {
         UserResponse response = userService.createUser(request);
@@ -59,6 +60,19 @@ public class UserController {
     public ResponseEntity<ErrorResponse> activateUser(@PathVariable Long id) {
 
         String message = userService.activateUser(id);
+
+        return ResponseEntity.ok(
+                ErrorResponse.builder()
+                        .error("SUCCESS")
+                        .message(message)
+                        .build());
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/{id}/delete") 
+    public ResponseEntity<ErrorResponse> deleteUser(@PathVariable Long id) {
+
+        String message = userService.deleteUser(id);
 
         return ResponseEntity.ok(
                 ErrorResponse.builder()

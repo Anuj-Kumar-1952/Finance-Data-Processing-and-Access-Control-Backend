@@ -14,4 +14,6 @@ public interface UserService {
     String deactivateUser(Long userId);
 
     String activateUser(Long userId);
+
+    String deleteUser(Long userId);
 }

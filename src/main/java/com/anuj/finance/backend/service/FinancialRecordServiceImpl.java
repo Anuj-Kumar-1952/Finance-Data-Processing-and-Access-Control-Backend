@@ -27,6 +27,9 @@ public class FinancialRecordServiceImpl implements FinancialRecordService {
     private final FinancialRecordRepository recordRepository;
     private final UserRepository userRepository;
 
+    /**
+     * Creates a new financial record for the authenticated user.
+     */
     @Override
     public FinancialRecordResponse createRecord(FinancialRecordRequest request, String email) {
 
@@ -46,6 +49,9 @@ public class FinancialRecordServiceImpl implements FinancialRecordService {
         return mapToResponse(record);
     }
 
+    /**
+     * Updates an existing record — only the owner can do this.
+     */
     @Override
     public FinancialRecordResponse updateRecord(Long id, FinancialRecordRequest request, String email) {
 
@@ -55,7 +61,8 @@ public class FinancialRecordServiceImpl implements FinancialRecordService {
 
         // Ownership check
         if (!record.getCreatedBy().getEmail().equals(email)) {
-            throw new RuntimeException("You are not allowed to update this record");
+            throw new org.springframework.security.access.AccessDeniedException(
+                    "You are not allowed to update this record");
         }
 
         // Update fields
@@ -116,7 +123,7 @@ public class FinancialRecordServiceImpl implements FinancialRecordService {
 
         record.setDeleted(true);
         record.setDeletedAt(LocalDateTime.now());
-        //soft delete - we can keep the record for audit purposes
+        // soft delete - we can keep the record for audit purposes
         recordRepository.save(record);
     }
 

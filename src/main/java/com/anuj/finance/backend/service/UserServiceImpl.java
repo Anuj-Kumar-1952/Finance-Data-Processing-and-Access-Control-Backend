@@ -73,6 +73,15 @@ public class UserServiceImpl implements UserService {
         return "User activated successfully";
     }
 
+    @Override
+    public String deleteUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        userRepository.delete(user);
+
+        return "User deleted successfully";
+    }
     private UserResponse mapToResponse(User user) {
         return UserResponse.builder()
                 .id(user.getId())
