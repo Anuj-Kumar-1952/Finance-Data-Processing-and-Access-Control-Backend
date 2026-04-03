@@ -11,7 +11,7 @@ public interface FinancialRecordService {
 
     List<FinancialRecordResponse> getAllRecords();
 
-    FinancialRecordResponse updateRecord(Long id, FinancialRecordRequest request);
+    FinancialRecordResponse updateRecord(Long id, FinancialRecordRequest request, String Email);
 
     void deleteRecord(Long id);
 }
