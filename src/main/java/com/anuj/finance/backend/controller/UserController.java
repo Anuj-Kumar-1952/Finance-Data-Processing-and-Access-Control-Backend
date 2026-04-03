@@ -5,8 +5,15 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+import com.anuj.finance.backend.dto.ErrorResponse;
 import com.anuj.finance.backend.dto.UserRequest;
 import com.anuj.finance.backend.dto.UserResponse;
 import com.anuj.finance.backend.service.UserService;
@@ -36,8 +43,27 @@ public class UserController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}/deactivate")
-    public ResponseEntity<Void> deactivateUser(@PathVariable Long id) {
-        userService.deactivateUser(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<ErrorResponse> deactivateUser(@PathVariable Long id) {
+
+        String message = userService.deactivateUser(id);
+
+        return ResponseEntity.ok(
+                ErrorResponse.builder()
+                        .error("SUCCESS")
+                        .message(message)
+                        .build());
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{id}/activate")
+    public ResponseEntity<ErrorResponse> activateUser(@PathVariable Long id) {
+
+        String message = userService.activateUser(id);
+
+        return ResponseEntity.ok(
+                ErrorResponse.builder()
+                        .error("SUCCESS")
+                        .message(message)
+                        .build());
     }
 }

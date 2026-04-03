@@ -13,10 +13,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.anuj.finance.backend.dto.FinancialRecordRequest;
 import com.anuj.finance.backend.dto.FinancialRecordResponse;
+import com.anuj.finance.backend.dto.PaginatedResponse;
 import com.anuj.finance.backend.service.FinancialRecordService;
 
 import jakarta.validation.Valid;
@@ -49,8 +51,12 @@ public class FinancialRecordController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN','ANALYST','VIEWER')")
-    public ResponseEntity<List<FinancialRecordResponse>> getAll() {
-        return ResponseEntity.ok(recordService.getAllRecords());
+    public ResponseEntity<PaginatedResponse<FinancialRecordResponse>> getAll(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(required = false) String type) {
+
+        return ResponseEntity.ok(recordService.getAllRecords(page, size, type));
     }
 
     @DeleteMapping("/{id}")

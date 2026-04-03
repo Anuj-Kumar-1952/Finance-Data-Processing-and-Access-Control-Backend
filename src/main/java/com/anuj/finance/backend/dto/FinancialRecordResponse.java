@@ -1,10 +1,11 @@
 package com.anuj.finance.backend.dto;
 
+import java.time.LocalDateTime;
+
 import com.anuj.finance.backend.entity.RecordType;
+
 import lombok.Builder;
 import lombok.Data;
-
-import java.time.LocalDate;
 
 @Data
 @Builder
@@ -14,7 +15,7 @@ public class FinancialRecordResponse {
     private Double amount;
     private RecordType type;
     private String category;
-    private LocalDate date;
+    private LocalDateTime date;
     private String description;
     private String createdBy;
 }

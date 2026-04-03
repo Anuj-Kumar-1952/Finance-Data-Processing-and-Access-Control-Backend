@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.anuj.finance.backend.dto.UserRequest;
 import com.anuj.finance.backend.dto.UserResponse;
 import com.anuj.finance.backend.entity.User;
+import com.anuj.finance.backend.exception.ResourceNotFoundException;
 import com.anuj.finance.backend.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -43,12 +44,33 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deactivateUser(Long userId) {
+    public String deactivateUser(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
+        if (!user.isActive()) {
+            return "User is already inactive";
+        }
         user.setActive(false);
         userRepository.save(user);
+
+        return "User deactivated successfully";
+    }
+
+    @Override
+    public String activateUser(Long userId) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        if (user.isActive()) {
+            return "User is already active";
+        }
+
+        user.setActive(true);
+        userRepository.save(user);
+
+        return "User activated successfully";
     }
 
     private UserResponse mapToResponse(User user) {
