@@ -13,6 +13,7 @@ public class UserRequest {
     private String name;
 
     @Email
+    @NotBlank
     private String email;
 
     @NotBlank

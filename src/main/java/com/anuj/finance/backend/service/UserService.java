@@ -11,6 +11,8 @@ public interface UserService {
 
     List<UserResponse> getAllUsers();
 
+    UserResponse getUserById(Long id);
+
     String deactivateUser(Long userId);
 
     String activateUser(Long userId);
