@@ -10,17 +10,21 @@ import com.anuj.finance.backend.dto.AuthRequest;
 import com.anuj.finance.backend.dto.AuthResponse;
 import com.anuj.finance.backend.service.AuthService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
+@Tag(name="Authentication", description="Endpoints for user authentication and token generation")
 public class AuthController {
 
     private final AuthService authService;
 
     @PostMapping("/login")
+    @Operation(summary = "User login", description = "Authenticates the user and returns a JWT token for subsequent requests.")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody AuthRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }
