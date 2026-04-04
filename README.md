@@ -92,6 +92,8 @@ finance-backend/
 
 * Create, update, delete records
 * View all records
+* Pagination support (page, size and type)
+* Filtering by record type (INCOME / EXPENSE)
 * Category-based classification
 * Ownership-based update restriction
 
