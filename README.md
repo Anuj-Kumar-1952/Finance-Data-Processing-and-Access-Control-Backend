@@ -26,7 +26,15 @@ finance-backend/
 ```
 
 ---
+## Highlights
 
+- Secure REST APIs with JWT authentication
+- Role-Based Access Control (ADMIN / ANALYST / VIEWER)
+- Financial data aggregation (income, expense, balance)
+- Swagger API documentation with JWT support
+- Clean layered architecture
+
+---
 ## 🚀 Tech Stack
 
 * Java 21
