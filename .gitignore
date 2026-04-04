@@ -3,6 +3,7 @@ target/
 .mvn/wrapper/maven-wrapper.jar
 .mvn/wrapper/maven-wrapper.properties
 .mvn/wrapper/maven-wrapper.sh
+.mvn/**
 !**/src/main/**/target/
 !**/src/test/**/target/
 src/main/resources/application.properties
