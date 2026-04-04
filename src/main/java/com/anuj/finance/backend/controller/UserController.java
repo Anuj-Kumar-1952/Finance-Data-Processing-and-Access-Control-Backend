@@ -33,7 +33,7 @@ public class UserController {
 
     private final UserService userService;
 
-    @PreAuthorize("hasRole('ADMIN')") // this is not required for creating admin user for the first time and should not be removed later
+    @PreAuthorize("hasRole('ADMIN')") // this must be disabled for creating admin user for the first time and should be enabled later
     @PostMapping
     @Operation(summary = "Create a new user (Admin only)", description = "Creates a new user with the specified details. This endpoint is intended for creating the first admin user and should be protected or removed after initial setup.")
     public ResponseEntity<UserResponse> createUser(@Valid @RequestBody UserRequest request) {
